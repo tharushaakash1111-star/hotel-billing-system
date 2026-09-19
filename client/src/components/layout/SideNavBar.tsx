@@ -17,32 +17,34 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({ onOpenBookingModal }) =>
   ];
 
   return (
-    <aside className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 backdrop-blur-xl bg-white/80 shadow-[30px_0_60px_-15px_rgba(0,21,47,0.15)] z-50 py-8 px-4 justify-between transition-all duration-300">
+    <aside className="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 backdrop-blur-xl bg-white/80 dark:bg-tertiary-container/80 shadow-[30px_0_60px_-15px_rgba(0,21,47,0.15)] z-50 py-8 px-4 justify-between transition-all duration-300">
       <div>
-        <div className="mb-12 px-2">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-10 h-10 rounded-full bg-[#00152f] flex items-center justify-center shadow-lg">
-              <span className="material-symbols-outlined text-white">hotel_class</span>
+        {/* Brand Header */}
+        <div className="mb-10 px-2">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-md">
+              <span className="material-symbols-outlined text-white text-[22px]">hotel_class</span>
             </div>
-            <h2 className="text-headline-sm font-headline-sm font-bold text-[#00152f] tracking-tight">SkyNest Hotels</h2>
+            <h2 className="text-headline-sm font-headline-sm font-bold text-primary tracking-tight text-xl">SkyNest Hotels</h2>
           </div>
-          <p className="text-label-sm font-label-sm text-[#43474e] uppercase tracking-widest pl-14">Executive Management</p>
+          <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-widest pl-12">Executive Management</p>
         </div>
 
-        <ul className="space-y-2">
+        {/* Navigation Tabs */}
+        <ul className="space-y-1.5">
           {navItems.map((item) => {
             const isActive = currentPath === item.path;
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-lg text-label-md font-label-md transition-all duration-300 ${
+                  className={`flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
                     isActive
-                      ? 'text-[#00152f] font-bold border-r-4 border-[#00152f] bg-[#f0f3ff] scale-95 origin-left'
-                      : 'text-[#43474e] hover:text-[#00152f] hover:bg-[#dee8ff]'
+                      ? 'text-primary font-bold border-r-4 border-primary bg-surface-container-low scale-95 origin-left shadow-sm'
+                      : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-high'
                   }`}
                 >
-                  <span className="material-symbols-outlined">{item.icon}</span>
+                  <span className={`material-symbols-outlined text-[20px] ${isActive ? 'fill' : ''}`}>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               </li>
@@ -52,25 +54,27 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({ onOpenBookingModal }) =>
       </div>
 
       <div>
+        {/* Action Button */}
         <button
           onClick={onOpenBookingModal}
-          className="w-full mb-8 py-3 px-4 bg-[#00152f] text-white rounded-lg text-label-md font-label-md font-semibold hover:shadow-lg hover:shadow-[#00152f]/20 transition-all duration-300 flex justify-center items-center gap-2"
+          className="w-full mb-6 py-3 px-4 bg-primary hover:bg-primary-container text-white rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 flex justify-center items-center gap-2 shadow-md"
         >
           <span className="material-symbols-outlined text-[18px]">add</span>
           New Booking
         </button>
 
-        <ul className="space-y-2 border-t border-[#c4c6cf]/30 pt-4">
+        {/* Footer Settings */}
+        <ul className="space-y-1.5 border-t border-outline-variant/30 pt-4 px-2">
           <li>
-            <a href="#" className="flex items-center gap-4 px-4 py-2 rounded-lg text-[#43474e] hover:text-[#00152f] hover:bg-[#dee8ff] transition-all duration-300">
+            <a href="#" className="flex items-center gap-4 px-2 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-sm font-medium">
               <span className="material-symbols-outlined text-[20px]">settings</span>
-              <span className="text-label-md font-label-md">Settings</span>
+              <span>Settings</span>
             </a>
           </li>
           <li>
-            <a href="#" className="flex items-center gap-4 px-4 py-2 rounded-lg text-[#43474e] hover:text-[#00152f] hover:bg-[#dee8ff] transition-all duration-300">
+            <a href="#" className="flex items-center gap-4 px-2 py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-sm font-medium">
               <span className="material-symbols-outlined text-[20px]">help_center</span>
-              <span className="text-label-md font-label-md">Support</span>
+              <span>Support</span>
             </a>
           </li>
         </ul>
