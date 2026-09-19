@@ -1,0 +1,137 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String   // Colombo, Kandy, Galle
+  address   String
+  phone     String
+  rooms     Room[]
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         String     @default("FRONT_DESK") // SYSTEM_ADMIN, BRANCH_MANAGER, FRONT_DESK, SERVICE_STAFF, GUEST
+  branchId     String?
+  branch       Branch?    @relation(fields: [branchId], references: [id])
+  mfaEnabled   Boolean    @default(false)
+  mfaSecret    String?
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+}
+
+model Guest {
+  id              String           @id @default(uuid())
+  fullName        String
+  email           String           @unique
+  phone           String
+  idType          String?          // Passport / NIC
+  idNumber        String?
+  loyaltyMemberId String?
+  bookings        Booking[]
+  attributes      GuestAttribute[]
+  createdAt       DateTime         @default(now())
+}
+
+model GuestAttribute {
+  id      String @id @default(uuid())
+  guestId String
+  guest   Guest  @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  key     String // e.g., Dietary, VIP Status
+  value   String
+}
+
+model RoomType {
+  id          String  @id @default(uuid())
+  title       String  // Executive Suite, Premium Double
+  description String?
+  baseRate    Float
+  rooms       Room[]
+}
+
+model Room {
+  id         String        @id @default(uuid())
+  roomNumber String
+  branchId   String
+  branch     Branch        @relation(fields: [branchId], references: [id])
+  typeId     String
+  roomType   RoomType      @relation(fields: [typeId], references: [id])
+  status     String        @default("AVAILABLE") // AVAILABLE, OCCUPIED, MAINTENANCE, OUT_OF_ORDER
+  bookings   BookingRoom[]
+}
+
+model Booking {
+  id              String         @id @default(uuid())
+  bookingRef      String         @unique // e.g. BKG-8892
+  guestId         String
+  guest           Guest          @relation(fields: [guestId], references: [id])
+  checkInDate     DateTime
+  checkOutDate    DateTime
+  status          String         @default("CONFIRMED") // DRAFT, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED, NO_SHOW
+  totalAmount     Float
+  outstandingDues Float
+  rooms           BookingRoom[]
+  serviceUsages   ServiceUsage[]
+  payments        Payment[]
+  createdAt       DateTime       @default(now())
+}
+
+model BookingRoom {
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  roomId    String
+  room      Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@id([bookingId, roomId])
+}
+
+model ServiceCatalogue {
+  id       String         @id @default(uuid())
+  name     String         // Room Service, Spa, Transport
+  category String
+  price    Float
+  usages   ServiceUsage[]
+}
+
+model ServiceUsage {
+  id          String           @id @default(uuid())
+  bookingId   String
+  booking     Booking          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  serviceId   String
+  service     ServiceCatalogue @relation(fields: [serviceId], references: [id])
+  quantity    Int              @default(1)
+  totalPrice  Float
+  status      String           @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+  requestedAt DateTime         @default(now())
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount    Float
+  method    String   // CASH, CREDIT_CARD, BANK_TRANSFER, CORPORATE_ACCOUNT
+  stripeId  String?
+  paidAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  details   String
+  ipAddress String
+  createdAt DateTime @default(now())
+}
